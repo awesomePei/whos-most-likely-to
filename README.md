@@ -6,14 +6,10 @@ A real-time multiplayer web game built with React, Tailwind, and Socket.IO.
 
 ```bash
 npm install
-```
 
-## Run backend
-```bash
+# Run backend
 node server/index.js
-```
 
-## Run frontend
-```bash
+# Run frontend
 npm run dev
 ```
