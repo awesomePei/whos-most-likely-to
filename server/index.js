@@ -9,13 +9,27 @@ const io = new Server(server, {
   cors: { origin: "*" },
 });
 
-const QUESTION_BANK = [
-  "Who's most likely to become a millionaire?",
-  "Who's most likely to go skydiving?",
-  "Who's most likely to cry during a movie?",
-  "Who's most likely to start their own company?",
-  "Who's most likely to forget their best friend’s birthday?"
-];
+const QUESTION_BANK = {
+    basic: [
+        "Who's most likely to become a millionaire?",
+        "Who's most likely to go skydiving?",
+        "Who's most likely to cry during a movie?",
+        "Who's most likely to start their own company?",
+        "Who's most likely to forget their best friend’s birthday?"
+    ],
+    romance: [
+        "Who's most likely to fall in love at first sight?",
+        "Who's most likely to stop hanging out with friends when in a relationship?",
+        "Who's most likely to hang on to a bad relationship?",
+        "Whos's most likely to turn into a different person when they are in love?",
+    ],
+    moral: [
+        "Who's most likely to cheat to pass an exam?",
+        "Who's most likely to do illegal jobs for huge money?",
+        "Who's most likely to jump a red light?",
+        "Who's most likely to laugh when someone falls?",
+    ]
+}
 
 // Room state map
 const rooms = new Map();
@@ -50,13 +64,18 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("players", room.players, room.hostId);
   });
 
-  socket.on("startGame", ({ roomId }) => {
+  socket.on("getGenres", () => {
+    socket.emit("genres", Object.keys(QUESTION_BANK));
+  });
+
+  socket.on("startGame", ({ roomId, genre }) => {
     const room = rooms.get(roomId);
-    if (!room) return;
+    if (!room || !QUESTION_BANK[genre]) return;
 
     room.votes = {}; // Reset votes at game start
+    room.genre = genre;
     room.questionIndex = 0;  // Add this
-    room.currentQuestion = QUESTION_BANK[0];
+    room.currentQuestion = QUESTION_BANK[genre][0];
     // room.hostId = socket.id;  // Set host here
 
     rooms.set(roomId, room);
@@ -109,17 +128,18 @@ io.on("connection", (socket) => {
 
     room.votes = {};
     room.questionIndex++;
+    const questions = QUESTION_BANK[room.genre];
 
-    if (room.questionIndex >= QUESTION_BANK.length) {
+    if (room.questionIndex >= questions.length) {
       io.to(roomId).emit("gameOver");
       room.hostId = null; // reset host when game ends
     } else {
-      room.currentQuestion = QUESTION_BANK[room.questionIndex];
+      room.currentQuestion = questions[room.questionIndex];
     }
 
     rooms.set(roomId, room);
 
-    if (room.questionIndex >= QUESTION_BANK.length) {
+    if (room.questionIndex >= questions.length) {
       io.to(roomId).emit("gameOver");
     } else {
       io.to(roomId).emit("newQuestion", room.currentQuestion);

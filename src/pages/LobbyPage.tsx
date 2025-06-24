@@ -21,6 +21,17 @@ function LobbyPage() {
   const [joined, setJoined] = useState(false);
   const [players, setPlayers] = useState<Player[]>([]);
   const [hostId, setHostId] = useState<string | null>(null);
+  const [selectedGenre, setSelectedGenre] = useState("basic");
+  const [genres, setGenres] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.emit("getGenres");
+    socket.on("genres", (genreList: string[]) => setGenres(genreList));
+    return () => {
+        socket.off("genres");
+    };
+  }, [socket]);
 
   useEffect(() => {
     if (!socket || !roomId) return;
@@ -50,9 +61,9 @@ function LobbyPage() {
     }
   };
 
-  const handleStart = () => {
+  const handleStart = (genre: string) => {
     if (socket && roomId) {
-      socket.emit("startGame", { roomId });
+      socket.emit("startGame", { roomId, genre });
     }
   };
 
@@ -97,12 +108,26 @@ function LobbyPage() {
           </ul>
 
           {socket?.id === hostId && (
-            <button
-              onClick={handleStart}
-              className="px-6 py-2 bg-green-600 text-white rounded"
-            >
-              Start Game
-            </button>
+            <div className="flex flex-col items-center gap-2">
+                <label htmlFor="genre" className="text-sm">Choose Genre:</label>
+                <select
+                id="genre"
+                value={selectedGenre}
+                onChange={(e) => setSelectedGenre(e.target.value)}
+                className="border rounded px-3 py-1"
+                >
+                {genres.map((g) => (
+                    <option key={g} value={g}>{g.charAt(0).toUpperCase() + g.slice(1)}</option>
+                ))}
+                </select>
+
+                <button
+                onClick={() => handleStart(selectedGenre)}
+                className="px-6 py-2 bg-green-600 text-white rounded"
+                >
+                Start Game
+                </button>
+            </div>
           )}
           {socket?.id !== hostId && <p>Waiting for host to start the game...</p>}
         </>
