@@ -52,6 +52,9 @@ io.on("connection", (socket) => {
       hostId: null,
       votes: {},         
       currentQuestion: "", 
+      genre: "",
+      questionIndex: 0,
+      winTally: {},
     };
 
     room.players.push({ id: socket.id, nickname });
@@ -109,6 +112,11 @@ io.on("connection", (socket) => {
           return player ? player.nickname : "Unknown";
         });
 
+      // When a round ends (in your vote handler), after determining winners:
+      winners.forEach((nickname) => {
+        room.winTally[nickname] = (room.winTally[nickname] || 0) + 1;
+      });
+
       // Broadcast results
       io.to(roomId).emit("votingResults", {
         tally,
@@ -131,19 +139,24 @@ io.on("connection", (socket) => {
     const questions = QUESTION_BANK[room.genre];
 
     if (room.questionIndex >= questions.length) {
+      // Find the player(s) with the most wins
+      const maxWins = Math.max(...Object.values(room.winTally));
+      const overallWinners = Object.entries(room.winTally)
+        .filter(([_, count]) => count === maxWins)
+        .map(([nickname]) => nickname);
+
+      io.to(roomId).emit("finalResults", {
+          winTally: room.winTally,
+          overallWinners,
+      });
       io.to(roomId).emit("gameOver");
-      room.hostId = null; // reset host when game ends
+    //   room.hostId = null;
     } else {
       room.currentQuestion = questions[room.questionIndex];
+      io.to(roomId).emit("newQuestion", room.currentQuestion);
     }
 
     rooms.set(roomId, room);
-
-    if (room.questionIndex >= questions.length) {
-      io.to(roomId).emit("gameOver");
-    } else {
-      io.to(roomId).emit("newQuestion", room.currentQuestion);
-    }
     io.to(roomId).emit("players", room.players, room.hostId);
   });
 

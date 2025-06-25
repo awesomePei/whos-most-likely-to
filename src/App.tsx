@@ -4,6 +4,7 @@ import LandingPage from "./pages/LandingPage";
 import LobbyPage from "./pages/LobbyPage";
 import GamePage from "./pages/GamePage";
 import ResultPage from "./pages/ResultPage";
+import FinalResultPage from "./pages/FinalResultPage";  
 import './index.css';
 import { useEffect, useState } from "react";
 
@@ -42,6 +43,7 @@ function App() {
             <Route path="/lobby/:roomId" element={<LobbyPage />} />
             <Route path="/game/:roomId" element={<GamePage />} />
             <Route path="/result/:roomId" element={<ResultPage />} />
+            <Route path="/final/:roomId" element={<FinalResultPage />} />
           </Routes>
         </main>
       </div>

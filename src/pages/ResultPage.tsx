@@ -9,14 +9,16 @@ function ResultPage() {
   const location = useLocation();
   const socket = useSocket();
 
-  const { winners, tally, players } = location.state || {};
+  const { winners, tally } = location.state || {};
   const [hostId, setHostId] = useState<string | null>(null);
+  const [playerList, setPlayerList] = useState<any[]>([]); 
 
   useEffect(() => {
     if (!socket || !roomId) return;
 
     // Listen for updated player list and host info
     socket.on("players", (_players, hostId) => {
+      setPlayerList(_players);
       setHostId(hostId);
     });
 
@@ -25,24 +27,29 @@ function ResultPage() {
     // Listen for game over
     socket.on("gameOver", () => {
       alert("🎉 Game Over! Thanks for playing!");
-      navigate("/");
+    //   navigate("/");
     });
 
     socket.on("newQuestion", () => {
       navigate(`/game/${roomId}`);
     });
 
+    socket.on("finalResults", (data) => {
+      navigate(`/final/${roomId}`, { state: data });
+    });
+
     return () => {
       socket.off("players");
       socket.off("gameOver");
       socket.off("newQuestion");
+      socket.off("finalResults");
     };
   }, [socket, roomId, navigate]);
 
   const isHost = socket?.id === hostId;
 
   const getNickname = (id: string) =>
-    players?.find((p: any) => p.id === id)?.nickname || id;
+    playerList?.find((p: any) => p.id === id)?.nickname || id;
 
   const handleNext = () => {
     if (socket && roomId) {
