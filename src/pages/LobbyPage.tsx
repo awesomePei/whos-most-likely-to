@@ -23,6 +23,9 @@ function LobbyPage() {
   const [hostId, setHostId] = useState<string | null>(null);
   const [selectedGenre, setSelectedGenre] = useState("basic");
   const [genres, setGenres] = useState<string[]>([]);
+  // Copy Room ID button state
+  const [copied, setCopied] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     if (!socket) return;
@@ -68,69 +71,97 @@ function LobbyPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen gap-6 p-4">
-      <h2 className="text-2xl font-semibold">Room: {roomId}</h2>
-
-      {!joined ? (
-        <>
-          <input
-            type="text"
-            placeholder="Enter your nickname"
-            className="border px-3 py-2 rounded w-64 text-center"
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleJoin();
-            }}
-          />
+    <div className="flex flex-col items-center justify-start h-screen w-screen bg-gradient-to-br from-pink-100 via-yellow-100 to-indigo-100 pt-12 md:pt-20 px-4">
+      <div className="max-w-4xl w-full bg-white/60 ring-1 ring-white/40 rounded-2xl shadow-xl p-8 flex flex-col items-center gap-6">
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl font-semibold">Room: {roomId}</h2>
           <button
-            className="px-6 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
-            disabled={!nickname.trim()}
-            onClick={handleJoin}
+            onClick={() => {
+              if (roomId) {
+                navigator.clipboard.writeText(roomId);
+                setCopied(true);
+                setShowToast(true);
+                setTimeout(() => {
+                  setCopied(false);
+                  setShowToast(false);
+                }, 1000);
+              }
+            }}
+            className="px-3 py-1 bg-white/70 border rounded hover:scale-105 transition"
+            title="Copy Room ID"
           >
-            Join Lobby
+            {copied ? "✅ Copied" : "📋 Copy"}
           </button>
-        </>
-      ) : (
-        <>
-          <p className="mb-2">Players in room:</p>
-          <ul className="mb-4 space-y-1">
-            {players.map((player) => (
-              <li
-                key={player.id}
-                className={`px-4 py-1 rounded ${
-                  player.id === hostId ? "bg-yellow-300 font-bold" : "bg-gray-300"
-                }`}
-              >
-                {player.nickname} {player.id === hostId && "(Host)"}
-              </li>
-            ))}
-          </ul>
+        </div>
 
-          {socket?.id === hostId && (
-            <div className="flex flex-col items-center gap-2">
-                <label htmlFor="genre" className="text-sm">Choose Genre:</label>
-                <select
-                id="genre"
-                value={selectedGenre}
-                onChange={(e) => setSelectedGenre(e.target.value)}
-                className="border rounded px-3 py-1"
+        {!joined ? (
+          <>
+            <input
+              type="text"
+              placeholder="Enter your nickname"
+              className="border px-3 py-2 rounded w-64 text-center"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleJoin();
+              }}
+            />
+            <button
+              className="px-6 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+              disabled={!nickname.trim()}
+              onClick={handleJoin}
+            >
+              Join Lobby
+            </button>
+          </>
+        ) : (
+          <>
+            <p className="mb-2">Players in room:</p>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mb-4">
+              {players.map((player) => (
+                <li
+                  key={player.id}
+                  className={`flex items-center justify-center px-4 py-2 rounded-xl shadow-md transition-transform duration-200 hover:scale-105 ${
+                    player.id === hostId
+                      ? "bg-yellow-200/80 text-yellow-900 font-bold"
+                      : "bg-white/70 text-gray-800"
+                  }`}
                 >
-                {genres.map((g) => (
-                    <option key={g} value={g}>{g.charAt(0).toUpperCase() + g.slice(1)}</option>
-                ))}
-                </select>
+                  {player.nickname} {player.id === hostId && "(Host)"}
+                </li>
+              ))}
+            </ul>
 
-                <button
-                onClick={() => handleStart(selectedGenre)}
-                className="px-6 py-2 bg-green-600 text-white rounded"
-                >
-                Start Game
-                </button>
-            </div>
-          )}
-          {socket?.id !== hostId && <p>Waiting for host to start the game...</p>}
-        </>
+            {socket?.id === hostId && (
+              <div className="flex flex-col items-center gap-2">
+                  <label htmlFor="genre" className="text-sm">Choose Question Genre:</label>
+                  <select
+                  id="genre"
+                  value={selectedGenre}
+                  onChange={(e) => setSelectedGenre(e.target.value)}
+                  className="border rounded px-3 py-1"
+                  >
+                  {genres.map((g) => (
+                      <option key={g} value={g}>{g.charAt(0).toUpperCase() + g.slice(1)}</option>
+                  ))}
+                  </select>
+
+                  <button
+                  onClick={() => handleStart(selectedGenre)}
+                  className="px-6 py-2 bg-green-600 text-white rounded"
+                  >
+                  Start Game
+                  </button>
+              </div>
+            )}
+            {socket?.id !== hostId && <p>Waiting for host to start the game...</p>}
+          </>
+        )}
+      </div>
+      {showToast && (
+        <div className="fixed bottom-5 bg-black/80 text-white px-4 py-2 rounded shadow text-sm">
+          已複製！
+        </div>
       )}
     </div>
   );
