@@ -54,7 +54,7 @@ function ResultPage() {
   const handleNext = () => {
     if (socket && roomId) {
       socket.emit("nextQuestion", { roomId });
-      navigate(`/game/${roomId}`);
+    //   navigate(`/game/${roomId}`);
     }
   };
 
