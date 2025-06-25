@@ -62,25 +62,27 @@ function GamePage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen gap-4 px-4">
-      <h1 className="text-2xl font-semibold">Room: {roomId}</h1>
-      <h2 className="text-2xl font-medium mb-10 text-center tracking-wide">{question}</h2>
+    <div className="flex flex-col items-center justify-start h-screen w-screen bg-gradient-to-br from-pink-100 via-yellow-100 to-indigo-100 pt-12 md:pt-20 px-4">
+      <div className="max-w-4xl w-full bg-white/60 ring-1 ring-white/40 rounded-2xl shadow-xl p-8 flex flex-col items-center gap-6">
+        <h1 className="text-2xl font-semibold">Room: {roomId}</h1>
+        <h2 className="text-2xl font-medium mb-10 text-center tracking-wide">{question}</h2>
 
-      {!voted ? (
-        <div className="grid grid-cols-3 gap-4">
-          {players.map((player) => (
-            <button
-              key={player.id}
-              onClick={() => handleVote(player.id)}
-              className="bg-gray-200 hover:bg-gray-300 text-black text-xl font-bold px-8 py-4 rounded-md shadow transition-all duration-150"
-            >
-              {player.nickname}
-            </button>
-          ))}
-        </div>
-      ) : (
-        <p className="text-green-700 font-semibold text-xl mt-8">✅ Vote submitted. Waiting for others...</p>
-      )}
+        {!voted ? (
+          <div className="grid grid-cols-3 gap-4">
+            {players.map((player) => (
+              <button
+                key={player.id}
+                onClick={() => handleVote(player.id)}
+                className="bg-white/70 hover:bg-pink-100 text-black text-lg font-semibold px-6 py-3 rounded-xl shadow-md transition-transform duration-200 hover:scale-105 break-words text-center w-full max-w-[160px]"
+              >
+                {player.nickname}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="text-green-700 font-semibold text-xl mt-8 text-center w-full">✅ Vote submitted. Waiting for others...</p>
+        )}
+      </div>
     </div>
   );
 }
