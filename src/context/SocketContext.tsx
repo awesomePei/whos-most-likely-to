@@ -9,7 +9,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:4000'); // update with your backend
+    const newSocket = io('https://whos-most-likely-to.onrender.com'); // update with your backend
     setSocket(newSocket);
 
     return () => {
