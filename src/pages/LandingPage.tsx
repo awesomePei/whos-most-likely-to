@@ -7,6 +7,7 @@ function LandingPage() {
 
   const handleCreate = () => {
     const newRoom = Math.random().toString(36).substring(2, 6).toUpperCase();
+    localStorage.setItem("isHost", "true");
     navigate(`/lobby/${newRoom}?host=true`);
   };
 

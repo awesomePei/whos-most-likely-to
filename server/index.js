@@ -44,27 +44,50 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("joinRoom", ({ roomId, nickname, isHost }) => {
+  socket.on("joinRoom", ({ roomId, nickname, clientId, isHost }) => {
     socket.join(roomId);
 
     let room = rooms.get(roomId) || {
       players: [],
       hostId: null,
+      hostClientId: null,
       votes: {},         
       currentQuestion: "", 
       genre: "",
       questionIndex: 0,
       winTally: {},
+      clientMap: {},
     };
 
-    room.players.push({ id: socket.id, nickname });
-    // if (!room.hostId) room.hostId = socket.id;
-    if (isHost && !room.hostId) {
-      room.hostId = socket.id;
+    // 如果這個 clientId 已經存在，就代表是刷新頁面，要更新 socket.id
+    const existing = room.players.find((p) => p.clientId === clientId);
+    if (existing) {
+      existing.id = socket.id; // 更新 socket id
+      existing.nickname = nickname;
+    } else {
+      room.players.push({ id: socket.id, nickname, clientId });
+    }
+
+    // Host 判定與更新
+    if (isHost) {
+      if (!room.hostClientId) {
+        room.hostId = socket.id;
+        room.hostClientId = clientId;
+      } else if (room.hostClientId === clientId) {
+        room.hostId = socket.id;
+      }
+    } else {
+      if (clientId === room.hostClientId) {
+        room.hostId = socket.id;
+      }
     }
 
     rooms.set(roomId, room);
     io.to(roomId).emit("players", room.players, room.hostId);
+    console.log(`Room ${roomId} players:`);
+    console.log(room.players.map(p => `${p.nickname} (${p.clientId} / ${p.id})`));
+    console.log(`Host ID: ${room.hostId}`);
+
   });
 
   socket.on("getGenres", () => {

@@ -1,24 +1,23 @@
 // src/pages/LobbyPage.tsx
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useSocket } from "../context/SocketContext";
-import qs from "query-string"; 
+import { getClientId } from "../utils/clientId"; 
 
 interface Player {
   id: string;
   nickname: string;
+  clientId: string;
 }
 
 function LobbyPage() {
   const { roomId } = useParams();
   const socket = useSocket();
   const navigate = useNavigate();
-  const location = useLocation();
-  const query = qs.parse(location.search);
-  const isHost = query.host === "true";
+  const isHost = localStorage.getItem("isHost") === "true";
 
-  const [nickname, setNickname] = useState("");
-  const [joined, setJoined] = useState(false);
+  const [nickname, setNickname] = useState(() => localStorage.getItem("nickname") || "");
+  const [joined, setJoined] = useState(() => localStorage.getItem("joined") === "true");
   const [players, setPlayers] = useState<Player[]>([]);
   const [hostId, setHostId] = useState<string | null>(null);
   const [selectedGenre, setSelectedGenre] = useState("basic");
@@ -27,12 +26,13 @@ function LobbyPage() {
   const [copied, setCopied] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
+  // 從後端抓 genres
   useEffect(() => {
     if (!socket) return;
     socket.emit("getGenres");
     socket.on("genres", (genreList: string[]) => setGenres(genreList));
     return () => {
-        socket.off("genres");
+      socket.off("genres");
     };
   }, [socket]);
 
@@ -57,9 +57,59 @@ function LobbyPage() {
     };
   }, [socket, roomId, navigate]);
 
+  useEffect(() => {
+    // Try to auto re-join if info is in localStorage
+    const savedNickname = localStorage.getItem("nickname");
+    const savedRoomId = localStorage.getItem("roomId");
+    const isHost = localStorage.getItem("isHost") === "true";
+    const clientId = getClientId();
+
+    console.log("Auto re-join check:", savedNickname, savedRoomId, roomId, clientId, isHost);
+
+    if (
+      socket &&
+      savedNickname &&
+      savedRoomId &&
+      savedRoomId === roomId
+    ) {
+      console.log("Auto re-joining room:", savedRoomId, "as", savedNickname);
+      // Only auto re-join if returning to the same room
+      socket.emit("joinRoom", { roomId: savedRoomId, nickname: savedNickname, clientId, isHost });
+      setNickname(savedNickname);
+      setJoined(true);
+    } else {
+      console.log("Joining new room:", roomId);
+      // If joining a new room, clear previous nickname and joined state
+      setNickname("");
+      setJoined(false);
+    //   localStorage.removeItem("nickname");
+    //   localStorage.removeItem("roomId");
+      //localStorage.removeItem("isHost");
+    }
+  }, [socket, roomId]);
+
+  // Clear localStorage when leaving the room (optional)
+//   useEffect(() => {
+//     return () => {
+//       localStorage.removeItem("nickname");
+//       localStorage.removeItem("roomId");
+//        //localStorage.removeItem("isHost");
+//     };
+//   }, []);
+
   const handleJoin = () => {
     if (socket && roomId && nickname.trim()) {
-      socket.emit("joinRoom", { roomId, nickname: nickname.trim(), isHost, });
+      const clientId = getClientId();
+      socket.emit("joinRoom", {
+        roomId,
+        nickname: nickname.trim(),
+        clientId,
+        isHost,
+      });
+      localStorage.setItem("nickname", nickname);
+      localStorage.setItem("joined", "true");
+      localStorage.setItem("roomId", roomId);
+      localStorage.setItem("isHost", String(isHost));
       setJoined(true);
     }
   };
