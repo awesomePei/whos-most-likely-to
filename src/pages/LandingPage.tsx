@@ -18,7 +18,7 @@ function LandingPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start h-screen w-screen bg-gradient-to-br from-pink-100 via-yellow-100 to-indigo-100 pt-12 md:pt-20 px-4">
+    <div className="flex flex-col items-center justify-start h-screen w-screen pt-12 md:pt-20 px-4">
       <div className="max-w-6xl w-full flex flex-col md:flex-row gap-8">
         <div className="flex-1 bg-white/60 ring-1 ring-white/40 rounded-2xl shadow-xl p-8 flex flex-col items-center justify-center gap-6">
           <h2 className="text-3xl font-bold text-rose-600 drop-shadow text-center">Start New Game</h2>
@@ -30,9 +30,9 @@ function LandingPage() {
           </button>
         </div>
         <div className="flex-1 bg-white/60 ring-1 ring-white/40 rounded-2xl shadow-xl p-8 flex flex-col items-center justify-center gap-6">
-          <h2 className="text-3xl font-bold text-yellow-600 drop-shadow text-center">Join Game</h2>
+          <h2 className="text-3xl font-bold text-yellow-500 drop-shadow text-center">Join Game</h2>
           <input
-            className="border-2 border-gray-300 focus:border-pink-400 px-4 py-2 rounded-full shadow-sm w-full text-center text-lg transition"
+            className="border-2 border-gray-300 focus:border-pink-400 px-4 py-2 rounded-full shadow-sm w-full text-center text-lg transition bg-white dark:bg-gray-800 text-black"
             placeholder="Enter room code"
             value={roomCode}
             onChange={(e) => setRoomCode(e.target.value)}

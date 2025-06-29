@@ -7,7 +7,7 @@ function FinalResultPage() {
   const { winTally, overallWinners } = location.state || {};
 
   return (
-    <div className="flex flex-col items-center justify-start h-screen w-screen bg-gradient-to-br from-pink-100 via-yellow-100 to-indigo-100 pt-12 md:pt-20 px-4">
+    <div className="flex flex-col items-center justify-start h-screen w-screen pt-12 md:pt-20 px-4">
       <div className="max-w-3xl w-full bg-white/60 ring-1 ring-white/40 rounded-2xl shadow-xl p-8 flex flex-col items-center gap-6">
         <h1 className="text-4xl font-extrabold bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 bg-clip-text text-transparent drop-shadow-sm text-center animate-pulse">
           🏁 Final Results – Room {roomId}

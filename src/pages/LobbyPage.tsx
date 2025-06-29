@@ -121,7 +121,7 @@ function LobbyPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start h-screen w-screen bg-gradient-to-br from-pink-100 via-yellow-100 to-indigo-100 pt-12 md:pt-20 px-4">
+    <div className="flex flex-col items-center justify-start h-screen w-screen pt-12 md:pt-20 px-4">
       <div className="max-w-4xl w-full bg-white/60 ring-1 ring-white/40 rounded-2xl shadow-xl p-8 flex flex-col items-center gap-6">
         <div className="flex items-center gap-2">
           <h2 className="text-2xl font-semibold">Room: {roomId}</h2>
@@ -149,7 +149,7 @@ function LobbyPage() {
             <input
               type="text"
               placeholder="Enter your nickname"
-              className="border px-3 py-2 rounded w-64 text-center"
+              className="border px-2 py-1 rounded bg-white dark:bg-gray-800 text-black dark:text-white"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               onKeyDown={(e) => {
@@ -184,27 +184,38 @@ function LobbyPage() {
 
             {socket?.id === hostId && (
               <div className="flex flex-col items-center gap-2">
-                  <label htmlFor="genre" className="text-sm">Choose Question Genre:</label>
-                  <select
-                  id="genre"
-                  value={selectedGenre}
-                  onChange={(e) => setSelectedGenre(e.target.value)}
-                  className="border rounded px-3 py-1"
+                  <label
+                    htmlFor="genre"
+                    className="text-sm text-black dark:text-white"
                   >
-                  {genres.map((g) => (
-                      <option key={g} value={g}>{g.charAt(0).toUpperCase() + g.slice(1)}</option>
-                  ))}
+                    Choose Question Genre:
+                  </label>
+                  <select
+                    id="genre"
+                    value={selectedGenre}
+                    onChange={(e) => setSelectedGenre(e.target.value)}
+                    className="border rounded px-3 py-1 bg-white dark:bg-gray-800 text-black dark:text-white"
+                  >
+                    {genres.map((g) => (
+                      <option key={g} value={g}>
+                        {g.charAt(0).toUpperCase() + g.slice(1)}
+                      </option>
+                    ))}
                   </select>
 
                   <button
-                  onClick={() => handleStart(selectedGenre)}
-                  className="px-6 py-2 bg-green-600 text-white rounded"
+                    onClick={() => handleStart(selectedGenre)}
+                    className="px-6 py-2 bg-green-600 text-white rounded"
                   >
-                  Start Game
+                    Start Game
                   </button>
               </div>
             )}
-            {socket?.id !== hostId && <p>Waiting for host to start the game...</p>}
+            {socket?.id !== hostId && (
+              <p className="text-black dark:text-black font-medium mt-4">
+                ⏳ Waiting for host to start the game...
+              </p>
+            )}
           </>
         )}
       </div>
