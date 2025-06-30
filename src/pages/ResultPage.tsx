@@ -10,7 +10,7 @@ function ResultPage() {
   const socket = useSocket();
 
 //   const { winners, tally } = location.state || {};
-  const [hostId, setHostId] = useState<string | null>(null);
+//   const [hostId, setHostId] = useState<string | null>(null);
   const [playerList, setPlayerList] = useState<any[]>([]); 
 
   const winners: string[] = useMemo(() => {
@@ -25,9 +25,9 @@ function ResultPage() {
     if (!socket || !roomId) return;
 
     // Listen for updated player list and host info
-    socket.on("players", (_players, hostId) => {
+    socket.on("players", (_players) => {
       setPlayerList(_players);
-      setHostId(hostId);
+    //   setHostId(hostId);
     });
 
     socket.emit("getPlayers", { roomId });
