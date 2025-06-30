@@ -15,20 +15,65 @@ const QUESTION_BANK = {
         "Who's most likely to go skydiving?",
         "Who's most likely to cry during a movie?",
         "Who's most likely to start their own company?",
-        "Who's most likely to forget their best friend’s birthday?"
     ],
     romance: [
         "Who's most likely to fall in love at first sight?",
         "Who's most likely to stop hanging out with friends when in a relationship?",
         "Who's most likely to hang on to a bad relationship?",
         "Whos's most likely to turn into a different person when they are in love?",
+        "Who's most likely to stalk their ex online?",
+        "Who's most likely to send a risky text at 2AM?",
+        "Who's most likely to believe in soulmates?",
     ],
     moral: [
         "Who's most likely to cheat to pass an exam?",
         "Who's most likely to do illegal jobs for huge money?",
         "Who's most likely to jump a red light?",
         "Who's most likely to laugh when someone falls?",
-    ]
+        "Who's most likely to lie to get out of trouble?",
+        "Who's most likely to break a promise and pretend they forgot?",
+        "Who's most likely to gossip but say they hate drama?",
+    ],
+    dirty: [
+        "Who is most likely to make out with a stranger?",
+        "Who is most likely to make a sex tape?",
+        "Who is most likely to read spicy romance books?",
+        "Who is most likely to have a naughty dream about someone in the room?",
+        "Who is most likely to have a naughty dream about someone in the room?",
+        "Who is most likely to look innocent but isn’t?",
+        "Who is most likely to have a secret OnlyFans account?",
+        "Who is most likely to flirt just for fun?",
+    ],
+    "Who's the worst person": [
+        "Who's most likely to forget their parents' birthday?",
+        "Who's most likely to forget someone’s name immediately after meeting them?",
+        "Most likely to lie on a resume?",
+        "Who's most likely to ignore a group project and still ask for credit?",
+        "Who's most likely to say 'I told you so' after your failure?",
+        "Who's most likely to ghost someone and act like it's normal?",
+        "Who's most likely to take credit for someone else's idea?",
+    ],
+    "Who's the best perosn": [
+        "Who's most likely to help a stranger in need?",
+        "Who's most likely to forgive someone who wronged them?",
+        "Who's most likely to be the first to apologize after a fight?",
+        "Who has the sweetest personality?",
+        "Who's the most responsible teammate?",
+        "Whos knows all the things about their friends?",
+    ],
+    "走心": [
+        "誰身上最沒有值得你學習的東西？",
+        "誰最有可能說『我有一個超棒的想法』結果超爛？",
+        "誰最有可能在你需要的時候給你很糟的建議？",
+        "誰最有可能在你低潮時講出一句話讓你更低潮？",
+        "你覺得誰的稱讚最空洞？",
+        "誰最常說自己社恐，但每次聚會都沒缺席？",
+        "誰的訊息讓你總是不知道怎麼回？",
+        "誰最常讓你懷疑自己是不是交錯朋友？",
+        "你覺得誰根本沒在乎你，只是剛好有空？",
+        "誰最有可能記得所有八卦，卻記不得你的生日？",
+    ],
+    
 }
 
 // Room state map

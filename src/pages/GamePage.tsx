@@ -2,6 +2,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useSocket } from "../context/SocketContext";
+import { getClientId } from "../utils/clientId"; 
 
 interface Player {
   id: string;
@@ -11,10 +12,37 @@ interface Player {
 function GamePage() {
   const { roomId } = useParams();
   const socket = useSocket();
-  const [question, setQuestion] = useState("Who's most likely to... become a millionaire?");
+  const [question, setQuestion] = useState("");
   const [players, setPlayers] = useState<Player[]>([]);
   const [voted, setVoted] = useState(false);
   const navigate = useNavigate();
+
+  // Auto rejoin logic
+  useEffect(() => {
+    const savedNickname = localStorage.getItem("nickname");
+    const savedRoomId = localStorage.getItem("roomId");
+    const isHost = localStorage.getItem("isHost") === "true";
+    const clientId = getClientId();
+
+    if (
+      socket &&
+      savedNickname &&
+      savedRoomId &&
+      savedRoomId === roomId
+    ) {
+      socket.emit("joinRoom", {
+        roomId: savedRoomId,
+        nickname: savedNickname,
+        clientId,
+        isHost
+      });
+
+      socket.emit("getPlayers", { roomId });
+      socket.emit("getCurrentQuestion", { roomId });
+      localStorage.setItem("phase", "game");
+    }
+  }, [socket, roomId]);
+
 
   useEffect(() => {
     if (!socket) return;
@@ -26,15 +54,20 @@ function GamePage() {
     socket.on("newQuestion", (q: string) => {
       setQuestion(q);
       setVoted(false);
+      localStorage.setItem("phase", "game");
     });
 
     socket.on("votingResults", ({ tally, winners }) => {
-        console.log("Voting results:", tally);
-        navigate(`/result/${roomId}`, { state: { winners, tally, players } });
+      localStorage.setItem("resultTally", JSON.stringify(tally));
+      localStorage.setItem("resultWinners", JSON.stringify(winners));
+      localStorage.setItem("phase", "result");
+      console.log("Voting results:", tally);
+      navigate(`/result/${roomId}`, { state: { winners, tally, players } });
     });
 
     socket.on("gameOver", () => {
       alert("🎉 Game Over! Thanks for playing!");
+      localStorage.clear();
       navigate("/");
     });
 

@@ -1,6 +1,6 @@
 // src/pages/ResultPage.tsx
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useSocket } from "../context/SocketContext";
 
 function ResultPage() {
@@ -9,9 +9,17 @@ function ResultPage() {
   const location = useLocation();
   const socket = useSocket();
 
-  const { winners, tally } = location.state || {};
+//   const { winners, tally } = location.state || {};
   const [hostId, setHostId] = useState<string | null>(null);
   const [playerList, setPlayerList] = useState<any[]>([]); 
+
+  const winners: string[] = useMemo(() => {
+    return location.state?.winners || JSON.parse(localStorage.getItem("resultWinners") || "[]");
+  }, [location.state]);
+
+  const tally: Record<string, number> = useMemo(() => {
+    return location.state?.tally || JSON.parse(localStorage.getItem("resultTally") || "{}");
+  }, [location.state]);
 
   useEffect(() => {
     if (!socket || !roomId) return;
@@ -27,6 +35,7 @@ function ResultPage() {
     // Listen for game over
     socket.on("gameOver", () => {
       alert("🎉 Game Over! Thanks for playing!");
+      localStorage.clear();
     //   navigate("/");
     });
 
@@ -46,7 +55,7 @@ function ResultPage() {
     };
   }, [socket, roomId, navigate]);
 
-  const isHost = socket?.id === hostId;
+  const isHost = localStorage.getItem("isHost") === "true";
 
   const getNickname = (id: string) =>
     playerList?.find((p: any) => p.id === id)?.nickname || id;
@@ -54,6 +63,7 @@ function ResultPage() {
   const handleNext = () => {
     if (socket && roomId) {
       socket.emit("nextQuestion", { roomId });
+      localStorage.setItem("phase", "game");
     //   navigate(`/game/${roomId}`);
     }
   };
